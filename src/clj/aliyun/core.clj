@@ -19,7 +19,8 @@
 (defn mk-acs-client
   [region access-key secret-key]
     (let [^DefaultProfile profile (mk-acs-profile region access-key secret-key)
-          ^DefaultAcsClient client (DefaultAcsClient. profile)]))
+          ^DefaultAcsClient client (DefaultAcsClient. profile)]
+    client))
 
 (defn get-response
   [^DefaultAcsClient client request]
