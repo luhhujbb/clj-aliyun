@@ -5,4 +5,15 @@
             DescribeInstanceAttributeRequest
             DescribeInstanceAttributeResponse
             DescribeInstanceStatusRequest
-            DescribeInstanceStatusResponse]))
+            DescribeInstanceStatusResponse
+            CreateInstanceRequest
+            CreateInstanceResponse
+            DeleteInstanceRequest
+            DeleteInstanceResponse])
+    (:require [aliyuncs.core :as acs]))
+
+(defn describe-instances
+  [client]
+  (let [desc-request (DescribeInstancesRequest.)
+        ^DescribeInstancesResponse desc-response (acs/get-response client desc-request)]
+        (bean desc-response)))

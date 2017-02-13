@@ -7,7 +7,7 @@
 
 (defn mk-creds-provider
   [access-key secret-key]
-  (let [^BasicICredentialProvider  provider(.BasicICredentialProvider access-key secret-key)]
+  (let [^BasicICredentialProvider  provider (BasicICredentialProvider. access-key secret-key)]
     provider))
 
 (defn mk-acs-profile
