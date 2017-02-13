@@ -15,5 +15,4 @@
                  [com.aliyun/aliyun-java-sdk-ecs "2.2.3"]]
  :source-paths ["src/clj"]
  :java-source-paths ["src/java"]
- :profiles {:uberjar {:aot :all}}
- :main ^:skip-aot aliyun.core)
+ :profiles {:uberjar {:aot :all}})
