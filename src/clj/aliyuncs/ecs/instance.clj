@@ -15,14 +15,29 @@
     (:require [aliyuncs.core :as acs])
     (:use [clojure.java.data]))
 
+(def internet-charge
+  {:bandwidth "PayByBandwidth"
+   :traffic "PayByTraffic"})
+
 (defn create-instance
   "Create an ecs instance and return instance-id"
-  [client {:keys [image-id instance-type security-group-id]}]
+  [client {:keys [image-id
+                  instance-type
+                  security-group-id
+                  internet-charge-type
+                  internet-max-bandwidth-in
+                  internet-max-bandwidth-out]
+           :or {internet-charge-type (:bandwidth internet-charge)}
+                internet-max-bandwidth-in 200
+                internet-max-bandwidth-out 0}]
   (let [^CreateInstanceRequest create-req (CreateInstanceRequest.)]
     (-> create-req
       (.setImageId image-id)
       (.setInstanceType instance-type)
-      (.setSecurityGroupId security-group-id))
+      (.setSecurityGroupId security-group-id)
+      (.setInternetChargeType internet-charge-type)
+      (.setInternetMaxBandwidthIn internet-charge-type)
+      (.setInternetMaxBandwidthOut internet-charge-type))
       (let [^CreateInstanceResponse create-resp (acs/get-response client create-req)]
        (.getInstanceId create-resp))))
 
