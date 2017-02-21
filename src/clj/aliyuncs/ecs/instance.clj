@@ -21,6 +21,35 @@
   {:bandwidth "PayByBandwidth" ;;not really by default, provoke API error, seems to be deprecated ??
    :traffic "PayByTraffic"})
 
+(defn set-tag
+  [create-req i key value]
+  (condp = i
+    1 (do
+        (.setTag1Key create-req key)
+        (.setTag1Value create-req value))
+    2  (do
+        (.setTag2Key create-req key)
+        (.setTag2Value create-req value))
+    3  (do
+        (.setTag3Key create-req key)
+        (.setTag3Value create-req value))
+    4  (do
+        (.setTag4Key create-req key)
+        (.setTag4Value create-req value))
+    5  (do
+        (.setTag5Key create-req key)
+        (.setTag5Value create-req value))
+    nil))
+
+(defn set-tags
+  [create-req tags]
+  (loop [tgs tags
+         tn 1]
+    (when-let [tag (first tgs)]
+      (let [[k v] tag]
+        (set-tag create-req tn (name k) v)
+        (recur (rest tgs) (inc tn))))))
+
 (defn create-instance
   "Create an ecs instance and return instance-id"
   [client {:keys [image-id
@@ -31,14 +60,13 @@
                   hostname
                   internet-charge-type
                   internet-max-bandwidth-in
-                  internet-max-bandwidth-out]
+                  internet-max-bandwidth-out
+                  tags] ;; a kv map : {:key value}
             ;;by default internet is disabled
            :or {internet-charge-type (:traffic internet-charge)
                 internet-max-bandwidth-in 200
                 internet-max-bandwidth-out 0
-                name hostname ;; if an hostname is set and no name, name is set to hostname
                 }}]
-
   (let [^CreateInstanceRequest create-req
           (doto (CreateInstanceRequest.)
             (.setImageId image-id)
@@ -53,7 +81,9 @@
           (when-not (nil? name)
             (.setInstanceName create-req name))
           (when-not (nil? hostname)
-            (.setHostName create-req hostname)))
+            (.setHostName create-req hostname))
+          (when-not (and (nil? tags) (>= 5 (count tags)))
+           (set-tags create-req tags))
       (let [^CreateInstanceResponse create-resp (acs/get-response client create-req)]
         (log/info "Instance with id" (.getInstanceId create-resp) "successfully created")
        (.getInstanceId create-resp))))
