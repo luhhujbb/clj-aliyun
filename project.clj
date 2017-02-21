@@ -13,7 +13,7 @@
                  [log4j "1.2.17"]
                   ;;alicloud
                  [com.aliyun/aliyun-java-sdk-core "3.0.8"]
-                 [com.aliyun/aliyun-java-sdk-ecs "2.2.3"]]
+                 [com.aliyun/aliyun-java-sdk-ecs "3.0.0"]]
  :source-paths ["src/clj"]
  :java-source-paths ["src/java"]
  :profiles {:uberjar {:aot :all}
