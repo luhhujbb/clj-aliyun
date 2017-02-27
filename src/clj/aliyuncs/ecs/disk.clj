@@ -85,7 +85,7 @@
         (set-tags create-req tags))
       (let [^CreateDiskResponse create-resp (acs/get-response client create-req)
             disk-id (.getDiskId create-resp)]
-        (log/info "Disk with id" disk-id "created")
+        (log/info "[ECS][DISK] Disk with id" disk-id "created")
         disk-id))))
 
 (defn delete-disk

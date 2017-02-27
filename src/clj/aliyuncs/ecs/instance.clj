@@ -85,7 +85,7 @@
           (when-not (and (nil? tags) (>= 5 (count tags)))
            (set-tags create-req tags))
       (let [^CreateInstanceResponse create-resp (acs/get-response client create-req)]
-        (log/info "Instance with id" (.getInstanceId create-resp) "successfully created")
+        (log/info "[ECS][INSTANCE] Instance with id" (.getInstanceId create-resp) "successfully created")
        (.getInstanceId create-resp))))
 
 (defn describe-instances
