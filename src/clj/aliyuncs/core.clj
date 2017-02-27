@@ -3,7 +3,13 @@
            [com.aliyuncs.profile DefaultProfile]
            [com.aliyuncs DefaultAcsClient AcsResponse]
            [com.aliyuncs.exceptions ClientException ServerException])
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.tools.logging :as log]
+            [clojure.string :as str]
+            [cheshire.core :refer :all]))
+
+(defn string-json-array
+  [coll]
+  (generate-string coll))
 
 (defn mk-creds-provider
   [access-key secret-key]

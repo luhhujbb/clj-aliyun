@@ -22,7 +22,7 @@
    :traffic "PayByTraffic"})
 
 (defn set-tag
-  [create-req i key value]
+  [^CreateInstanceRequest create-req i key value]
   (condp = i
     1 (do
         (.setTag1Key create-req key)
@@ -90,16 +90,20 @@
 
 (defn describe-instances
   "Describe instances"
-  [client]
-  (let [describe-req (DescribeInstancesRequest.)
-        ^DescribeInstancesResponse describe-resp (acs/get-response client describe-req)]
-        (from-java describe-resp)))
+  [client & [{:keys [page page-size]}]]
+  (let [describe-req (DescribeInstancesRequest.)]
+        (when page
+          (.setPageNumber describe-req (int page)))
+        (when (and page-size (< page-size 50))
+          (.setPageSize describe-req (int page-size)))
+        (let [^DescribeInstancesResponse describe-resp (acs/get-response client describe-req)]
+          (from-java describe-resp))))
 
 (defn describe-instance
   "Describe a single instance"
   [client instance-id]
   (let [describe-req (DescribeInstancesRequest.)]
-    (.setInstanceIds describe-req (str "[\"" instance-id "\"]"))
+    (.setInstanceIds describe-req (acs/string-json-array [instance-id]))
     (let [^DescribeInstancesResponse describe-resp (acs/get-response client describe-req)]
         (from-java describe-resp))))
 
