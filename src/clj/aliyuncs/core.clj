@@ -17,9 +17,10 @@
     provider))
 
 (defn mk-acs-profile
-  [region access-key secret-key]
+  [^String region access-key secret-key]
   (let [^BasicICredentialProvider creds-provider (mk-creds-provider access-key secret-key)
-        ^DefaultProfile profile (DefaultProfile/getProfile region creds-provider)]
+        ^DefaultProfile profile (DefaultProfile/getProfile region)]
+        (.setCredentialsProvider profile creds-provider)
     profile))
 
 (defn mk-acs-client
