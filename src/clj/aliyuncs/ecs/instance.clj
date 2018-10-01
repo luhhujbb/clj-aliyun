@@ -6,6 +6,8 @@
             DescribeInstanceAttributeResponse
             DescribeInstanceStatusRequest
             DescribeInstanceStatusResponse
+            ModifyInstanceAttributeRequest
+            ModifyInstanceAttributeResponse
             CreateInstanceRequest
             CreateInstanceRequest$Tag
             CreateInstanceResponse
@@ -22,7 +24,7 @@
   {:bandwidth "PayByBandwidth" ;;not really by default, provoke API error, seems to be deprecated ??
    :traffic "PayByTraffic"})
 
-(defn mk-tag
+(defn- mk-tag
    [tag]
    (let [^CreateInstanceRequest$Tag ali-tag (CreateInstanceRequest$Tag.)]
    (doto
@@ -31,7 +33,7 @@
        (.setValue (:value tag)))
        ali-tag))
 
-(defn set-tags
+(defn- set-tags
     [^CreateInstanceRequest create-req tags]
         (.setTags create-req (map mk-tag tags)))
 
@@ -98,6 +100,22 @@
   (let [^DescribeInstancesRequest describe-req (DescribeInstanceAttributeRequest.)
         ^DescribeInstanceAttributeResponse describe-resp (acs/get-response client describe-req)]
         (from-java describe-resp)))
+
+(defn rename-instance
+    "Set name of an instance"
+    [client instance-id instance-name]
+    (let [^ModifyInstanceAttributeRequest modify-req (ModifyInstanceAttributeRequest.)]
+        (.setInstanceId modify-req instance-id)
+        (.setInstanceName modify-req instance-name)
+        (acs/do-action client modify-req)))
+
+(defn set-instance-hostname
+    "Set hostname of an instance"
+    [client instance-id hostname]
+    (let [^ModifyInstanceAttributeRequest modify-req (ModifyInstanceAttributeRequest.)]
+        (.setInstanceId modify-req instance-id)
+        (.setHostName modify-req hostname)
+        (acs/do-action client modify-req)))
 
 (defn start-instance
   "Start a created instance"

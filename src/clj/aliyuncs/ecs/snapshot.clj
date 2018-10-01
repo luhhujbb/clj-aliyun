@@ -11,7 +11,7 @@
     (:use [clojure.java.data]))
 
 
-(defn mk-tag
+(defn- mk-tag
     [tag]
     (let [^CreateSnapshotRequest$Tag ali-tag (CreateSnapshotRequest$Tag.)]
     (doto
@@ -20,7 +20,7 @@
         (.setValue (:value tag)))
         ali-tag))
 
-(defn set-tags
+(defn- set-tags
   [^CreateSnapshotRequest create-req tags]
     (.setTags create-req (map mk-tag tags)))
 

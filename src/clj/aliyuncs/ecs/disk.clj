@@ -13,7 +13,7 @@
               [clojure.tools.logging :as log])
     (:use [clojure.java.data]))
 
-(defn mk-tag
+(defn- mk-tag
    [tag]
    (let [^CreateDiskRequest$Tag ali-tag (CreateDiskRequest$Tag.)]
    (doto
@@ -22,7 +22,7 @@
        (.setValue (:value tag)))
        ali-tag))
 
-(defn set-tags
+(defn- set-tags
     [^CreateDiskRequest create-req tags]
         (.setTags create-req (map mk-tag tags)))
 
