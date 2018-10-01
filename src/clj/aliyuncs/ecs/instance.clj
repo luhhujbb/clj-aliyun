@@ -7,6 +7,7 @@
             DescribeInstanceStatusRequest
             DescribeInstanceStatusResponse
             CreateInstanceRequest
+            CreateInstanceRequest$Tag
             CreateInstanceResponse
             DeleteInstanceRequest
             DeleteInstanceResponse
@@ -21,34 +22,18 @@
   {:bandwidth "PayByBandwidth" ;;not really by default, provoke API error, seems to be deprecated ??
    :traffic "PayByTraffic"})
 
-(defn set-tag
-  [^CreateInstanceRequest create-req i key value]
-  (condp = i
-    1 (do
-        (.setTag1Key create-req key)
-        (.setTag1Value create-req value))
-    2  (do
-        (.setTag2Key create-req key)
-        (.setTag2Value create-req value))
-    3  (do
-        (.setTag3Key create-req key)
-        (.setTag3Value create-req value))
-    4  (do
-        (.setTag4Key create-req key)
-        (.setTag4Value create-req value))
-    5  (do
-        (.setTag5Key create-req key)
-        (.setTag5Value create-req value))
-    nil))
+(defn mk-tag
+   [tag]
+   (let [^CreateInstanceRequest$Tag ali-tag (CreateInstanceRequest$Tag.)]
+   (doto
+       ali-tag
+       (.setKey (:key tag))
+       (.setValue (:value tag)))
+       ali-tag))
 
 (defn set-tags
-  [create-req tags]
-  (loop [tgs tags
-         tn 1]
-    (when-let [tag (first tgs)]
-      (let [[k v] tag]
-        (set-tag create-req tn (name k) v)
-        (recur (rest tgs) (inc tn))))))
+    [^CreateInstanceRequest create-req tags]
+        (.setTags create-req (map mk-tag tags)))
 
 (defn create-instance
   "Create an ecs instance and return instance-id"
@@ -91,7 +76,7 @@
 (defn describe-instances
   "Describe instances"
   [client & [{:keys [page page-size]}]]
-  (let [describe-req (DescribeInstancesRequest.)]
+  (let [^DescribeInstancesRequest describe-req (DescribeInstancesRequest.)]
         (when page
           (.setPageNumber describe-req (int page)))
         (when (and page-size (< page-size 50))
@@ -102,7 +87,7 @@
 (defn describe-instance
   "Describe a single instance"
   [client instance-id]
-  (let [describe-req (DescribeInstancesRequest.)]
+  (let [^DescribeInstancesRequest describe-req (DescribeInstancesRequest.)]
     (.setInstanceIds describe-req (acs/string-json-array [instance-id]))
     (let [^DescribeInstancesResponse describe-resp (acs/get-response client describe-req)]
         (from-java describe-resp))))
@@ -110,7 +95,7 @@
 (defn describe-instance-attribute
   "Describe instances attribute"
   [client instance-id]
-  (let [describe-req (DescribeInstanceAttributeRequest.)
+  (let [^DescribeInstancesRequest describe-req (DescribeInstanceAttributeRequest.)
         ^DescribeInstanceAttributeResponse describe-resp (acs/get-response client describe-req)]
         (from-java describe-resp)))
 

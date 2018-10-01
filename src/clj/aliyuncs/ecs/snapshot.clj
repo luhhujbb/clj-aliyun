@@ -3,45 +3,31 @@
             DescribeSnapshotsRequest
             DescribeSnapshotsResponse
             CreateSnapshotRequest
+            CreateSnapshotRequest$Tag
             CreateSnapshotResponse
             DeleteSnapshotRequest])
     (:require [aliyuncs.core :as acs]
               [clojure.tools.logging :as log])
     (:use [clojure.java.data]))
 
-(defn set-tag
-  [^CreateSnapshotRequest create-req i key value]
-  (condp = i
-    1 (do
-        (.setTag1Key create-req key)
-        (.setTag1Value create-req value))
-    2  (do
-        (.setTag2Key create-req key)
-        (.setTag2Value create-req value))
-    3  (do
-        (.setTag3Key create-req key)
-        (.setTag3Value create-req value))
-    4  (do
-        (.setTag4Key create-req key)
-        (.setTag4Value create-req value))
-    5  (do
-        (.setTag5Key create-req key)
-        (.setTag5Value create-req value))
-    nil))
+
+(defn mk-tag
+    [tag]
+    (let [^CreateSnapshotRequest$Tag ali-tag (CreateSnapshotRequest$Tag.)]
+    (doto
+        ali-tag
+        (.setKey (:key tag))
+        (.setValue (:value tag)))
+        ali-tag))
 
 (defn set-tags
-  [create-req tags]
-  (loop [tgs tags
-         tn 1]
-    (when-let [tag (first tgs)]
-      (let [[k v] tag]
-        (set-tag create-req tn (name k) v)
-        (recur (rest tgs) (inc tn))))))
+  [^CreateSnapshotRequest create-req tags]
+    (.setTags create-req (map mk-tag tags)))
 
 (defn describe-snapshots
   "Describe snapshots"
   [client & [{:keys [page page-size disk-id instance-id]}]]
-  (let [describe-req (DescribeSnapshotsRequest.)]
+  (let [^DescribeSnapshotsRequest describe-req (DescribeSnapshotsRequest.)]
     (when page
       (.setPageNumber describe-req (int page)))
     (when (and page-size (< page-size 50))
@@ -56,7 +42,7 @@
 (defn describe-snapshot
   "Describe snapshot"
   [client snapshot-id]
-  (let [describe-req (doto (DescribeSnapshotsRequest.)
+  (let [^DescribeSnapshotsRequest describe-req (doto (DescribeSnapshotsRequest.)
                         (.setSnapshotIds (acs/string-json-array [snapshot-id])))
         ^DescribeSnapshotsResponse describe-resp (acs/get-response client describe-req)]
         (from-java describe-resp)))

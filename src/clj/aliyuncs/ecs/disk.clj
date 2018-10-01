@@ -3,6 +3,7 @@
             DescribeDisksRequest
             DescribeDisksResponse
             CreateDiskRequest
+            CreateDiskRequest$Tag
             CreateDiskResponse
             DeleteDiskRequest
             AttachDiskRequest
@@ -12,34 +13,18 @@
               [clojure.tools.logging :as log])
     (:use [clojure.java.data]))
 
-(defn set-tag
-  [^CreateDiskRequest create-req i key value]
-  (condp = i
-    1 (do
-        (.setTag1Key create-req key)
-        (.setTag1Value create-req value))
-    2  (do
-        (.setTag2Key create-req key)
-        (.setTag2Value create-req value))
-    3  (do
-        (.setTag3Key create-req key)
-        (.setTag3Value create-req value))
-    4  (do
-        (.setTag4Key create-req key)
-        (.setTag4Value create-req value))
-    5  (do
-        (.setTag5Key create-req key)
-        (.setTag5Value create-req value))
-    nil))
+(defn mk-tag
+   [tag]
+   (let [^CreateDiskRequest$Tag ali-tag (CreateDiskRequest$Tag.)]
+   (doto
+       ali-tag
+       (.setKey (:key tag))
+       (.setValue (:value tag)))
+       ali-tag))
 
 (defn set-tags
-  [create-req tags]
-  (loop [tgs tags
-         tn 1]
-    (when-let [tag (first tgs)]
-      (let [[k v] tag]
-        (set-tag create-req tn (name k) v)
-        (recur (rest tgs) (inc tn))))))
+    [^CreateDiskRequest create-req tags]
+        (.setTags create-req (map mk-tag tags)))
 
 (def disk-category
   {:cloud "cloud"

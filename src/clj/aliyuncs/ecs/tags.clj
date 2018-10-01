@@ -1,9 +1,11 @@
 (ns aliyuncs.ecs.tags
   (:import [com.aliyuncs.ecs.model.v20140526
             AddTagsRequest
+            AddTagsRequest$Tag
             DescribeTagsRequest
             DescribeTagsResponse
             RemoveTagsRequest
+            RemoveTagsRequest$Tag
             DescribeResourceByTagsRequest
             DescribeResourceByTagsResponse])
     (:require [aliyuncs.core :as acs])
@@ -16,55 +18,33 @@
    :disk "disk"
    :security-group "securitygroup"})
 
-(defn set-tag
-  [^AddTagsRequest add-req i key value]
-  (condp = i
-    1 (do
-        (.setTag1Key add-req key)
-        (.setTag1Value add-req value))
-    2  (do
-        (.setTag2Key add-req key)
-        (.setTag2Value add-req value))
-    3  (do
-        (.setTag3Key add-req key)
-        (.setTag3Value add-req value))
-    4  (do
-        (.setTag4Key add-req key)
-        (.setTag4Value add-req value))
-    5  (do
-        (.setTag5Key add-req key)
-        (.setTag5Value add-req value))
-    nil))
+(defn- mk-add-tag
+    [tag]
+    (let [^AddTagsRequest$Tag ali-tag (AddTagsRequest$Tag.)]
+    (doto
+        ali-tag
+        (.setKey (:key tag))
+        (.setValue (:value tag)))
+        ali-tag))
 
-;;OK it's the same function
-(defn set-rm-tag
-  [^RemoveTagsRequest rm-req i key value]
-  (condp = i
-    1 (do
-        (.setTag1Key rm-req key)
-        (.setTag1Value rm-req value))
-    2  (do
-        (.setTag2Key rm-req key)
-        (.setTag2Value rm-req value))
-    3  (do
-        (.setTag3Key rm-req key)
-        (.setTag3Value rm-req value))
-    4  (do
-        (.setTag4Key rm-req key)
-        (.setTag4Value rm-req value))
-    5  (do
-        (.setTag5Key rm-req key)
-        (.setTag5Value rm-req value))
-    nil))
+(defn- mk-rm-tag
+    [tag]
+    (let [^RemoveTagsRequest$Tag ali-tag (RemoveTagsRequest$Tag.)]
+    (doto
+        ali-tag
+        (.setKey (:key tag))
+        (.setValue (:value tag)))
+        ali-tag))
 
-(defn set-tags
-  [add-req tags]
-  (loop [tgs tags
-         tn 1]
-    (when-let [tag (first tgs)]
-      (let [[k v] tag]
-        (set-tag add-req tn (name k) v)
-        (recur (rest tgs) (inc tn))))))
+(defn- set-add-tags
+  [^AddTagsRequest add-req tags]
+    (when (>= 20 (count tags)))
+        (.setTags add-req (map mk-add-tag tags)))
+
+(defn- set-rm-tags
+  [^RemoveTagsRequest add-req tags]
+    (when (>= 20 (count tags)))
+        (.setTags add-req (map mk-rm-tag tags)))
 
 (defn add-tags
   "Add Tags"
@@ -74,15 +54,16 @@
       (.setResourceType add-req (res-type resource-type))
       (.setResourceId add-req resource-id)
       (when tags
-        (set-tags add-req tags))
-      (acs/do-action client add-req))))
+        (set-add-tags add-req tags)
+        (acs/do-action client add-req)))))
 
-(defn remove-tag
+(defn remove-tags
   "remove a tag with specified index and k v"
-  [client {:keys [resource-type resource-id tag-index key value]}]
+  [client {:keys [resource-type resource-id tags]}]
   (let [^RemoveTagsRequest rm-req (RemoveTagsRequest.)]
     (when (and resource-type resource-id)
       (.setResourceType rm-req (res-type resource-type))
       (.setResourceId rm-req resource-id)
-      (set-rm-tag rm-req tag-index key value)
-      (acs/do-action client rm-req))))
+      (when tags
+          (set-rm-tags rm-req tags)
+          (acs/do-action client rm-req)))))
