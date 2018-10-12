@@ -1,4 +1,4 @@
-(defproject luhhujbb/clj-aliyun "0.2.2"
+(defproject luhhujbb/clj-aliyun "0.2.3"
   :description "Basic clojure lib to interact with aliyun ECS API"
   :url "https://github.com/luhhujbb/clj-aliyun"
   :license {:name "Eclipse Public License"
@@ -13,7 +13,7 @@
                  [log4j "1.2.17"]
                  [cheshire "5.6.3"]
                   ;;alicloud
-                 [com.aliyun/aliyun-java-sdk-core "4.1.0"]
+                 [com.aliyun/aliyun-java-sdk-core "4.1.1"]
                  [com.aliyun/aliyun-java-sdk-ecs "4.11.0"]]
  :source-paths ["src/clj"]
  :java-source-paths ["src/java"]
