@@ -6,6 +6,13 @@
   (:require [clojure.tools.logging :as log]
             [clojure.string :as str]
             [cheshire.core :refer :all]))
+        
+(def catch-errors (atom true))
+
+(defn catch-errors?
+    ([] @catch-errors)
+    ([tf]
+        (reset! catch-errors tf)))
 
 (defn string-json-array
   [coll]
@@ -31,18 +38,22 @@
 
 (defn get-response
   [^DefaultAcsClient client request]
-  (try
-    (.getAcsResponse client request)
-    (catch ServerException e
-      (log/error "Server Exception :" e))
-    (catch ClientException e
-      (log/error "Client Exception :" e))))
+  (if @catch-errors
+    (try
+        (.getAcsResponse client request)
+        (catch ServerException e
+            (log/error "Server Exception :" e))
+        (catch ClientException e
+            (log/error "Client Exception :" e)))
+    (.getAcsResponse client request)))
 
 (defn do-action
   [^DefaultAcsClient client action-request]
-  (try
-    (.doAction client action-request)
-    (catch ServerException e
-      (log/error "Server Exception :" e))
-    (catch ClientException e
-      (log/error "Client Exception :" e))))
+  (if @catch-errors
+    (try
+        (.doAction client action-request)
+            (catch ServerException e
+                (log/error "Server Exception :" e))
+            (catch ClientException e
+                (log/error "Client Exception :" e)))
+    (.doAction client action-request)))
