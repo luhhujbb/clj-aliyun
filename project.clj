@@ -1,4 +1,4 @@
-(defproject luhhujbb/clj-aliyun "0.2.3"
+(defproject luhhujbb/clj-aliyun "0.2.4"
   :description "Basic clojure lib to interact with aliyun ECS API"
   :url "https://github.com/luhhujbb/clj-aliyun"
   :license {:name "Eclipse Public License"
